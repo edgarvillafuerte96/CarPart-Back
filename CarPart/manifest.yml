@@ -1,0 +1,14 @@
+---
+applications:
+- name: CarPartBack
+  memory: 256mb
+  instances: 1
+  buildpacks:
+  - nodejs_buildpack
+  env:
+    OPTIMIZE_MEMORY: true
+  services:
+    - NIU
+    - test
+  stack: cflinuxfs3
+  command: npm start
