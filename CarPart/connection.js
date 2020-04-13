@@ -19,7 +19,7 @@ connection.connect(function(err){
         return;
     }
     conn=true;
-    console.log('connected to db');
+    console.log('connected to legacy db');
 });
 
 module.exports = connection;

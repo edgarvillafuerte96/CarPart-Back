@@ -9,6 +9,6 @@ applications:
     OPTIMIZE_MEMORY: true
   services:
     - NIU
-    - test
+    - parts
   stack: cflinuxfs3
   command: npm start
