@@ -11,8 +11,8 @@ module.exports = function(app) {
     app.route('/CC')
         .post(Custinfo.insertPayment)
 
-    //app.route('/order')
-    //    .post(Custinfo.orders)
+    app.route('/order')
+        .post(Custinfo.orders)
 
        
        

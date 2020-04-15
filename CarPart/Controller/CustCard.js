@@ -24,24 +24,24 @@ exports.insertPayment = function (req,res) {
     });
 }
 
-//exports.orders = function (req,res) {
+exports.orders = function (req , res) {
     //let statement ='INSERT INTO Order1(custid, authorization,amt_charged) VALUES(?,?,?)'
     //let values= [req.body.custid, req.body.authorization, req.body.amt_charged]
-//    let url = 'http://blitz.cs.niu.edu/CreditCard/';
-//    let msql ='SELECT ' + req.body.custid+' FROM Credit_Info';
-//    var res;
-//    awsConnection.query(msql, (err,results, fields)=>{
-//        if(err){
-//            return console.error(err.message);
-//        }
-//        res = results;
-//    });
-//
-//    let params = {'vendor': 'vendor-3a', 'tran':'1', 'cc': res.cardnum, 'name': res.credit_name , 'exp': res.exp ,'amount': req.body.amt_charged}
-//    console.log(params);
-   // awsConnection.query(statement, values, (err,results, fields)=>{
-   //     if(err){
-   //         return console.error(err.message);
-   //     }
-   //     res.send(results)
-   // });
+    let url = 'http://blitz.cs.niu.edu/CreditCard/';
+    let statement ='SELECT * FROM Credit_Info WHERE custid = 1';
+    let values = [req.body.custid]
+    console.log(statement);
+    var mysql_res;
+    awsConnection.query(statement, (err,results,fields)=>{
+        if(err){
+            return console.error(err.message);
+        }
+        mysql_res = results;
+        res.send(mysql_res);
+    });
+  //  console.log(mysql_res);
+    //let params = {'vendor': 'vendor-3a', 'tran': req.body.custid, 'cc': mysql_res.cardnum, 'name': mysql_res.credit_name , 'exp': mysql_res.exp ,'amount': req.body.amt_charged};
+
+    //onsole.log(params);
+   //res.send(mysql_res);
+}

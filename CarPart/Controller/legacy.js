@@ -9,6 +9,7 @@ exports.getallparts = function(req , res) {
             }
             res.send(results)
     });
+    
 };
 
 
