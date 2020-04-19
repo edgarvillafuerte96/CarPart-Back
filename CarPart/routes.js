@@ -7,6 +7,8 @@ module.exports = function(app) {
 
     app.route('/checkout')
         .post(Custinfo.checkout)
-       
+    
+    app.route('/charge')
+        .post(Custinfo.charge)
        
 };
