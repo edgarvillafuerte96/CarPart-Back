@@ -32,6 +32,7 @@ exports.updateinventory = function (req,res){
 
 
 
+
 exports.charge = function(req,res){
     let statement = 'INSERT INTO Misc_Charges(shiphand_price, toweight, fromweight) VALUES (?,?,?)';
     let values = [req.body.shiphand_price, req.body.toweight, req.body.fromweight]
@@ -105,3 +106,4 @@ exports.checkout = function(req,res){
         res.send(message);
     })
 }
+
