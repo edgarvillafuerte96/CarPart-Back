@@ -1,7 +1,7 @@
 module.exports = function(app) {
   var legacy = require ('./Controller/legacy');
   var Custinfo = require('./Controller/CustCard');
-    
+  var email = require('./Controller/email');
     app.route('/parts')
        .get(legacy.getallparts)
 
@@ -14,6 +14,9 @@ module.exports = function(app) {
     app.route('/order')
         .post(Custinfo.orders)
 
-       
+     app.route('/update')
+        .get(email.updateorder)  
+    app.route('/search')
+        .get(email.ordersearch)
        
 };
