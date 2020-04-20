@@ -1,7 +1,7 @@
 let awsConnection = require ('../awsConnection');
 const axios = require('axios');
 
-exports.inventory = function(req,res){
+exports.newinventory = function(req,res){
     let statement = 'INSERT INTO Part_Inventory(pnid, quantity) VALUES(?,?)';
     let values = [req.body.pnid, req.body.quantity];
     awsConnection.query(statement, values, (err,results)=>{
@@ -10,6 +10,28 @@ exports.inventory = function(req,res){
     });
 }
 
+exports.getinventory = function (req,res){
+    let statement = `SELECT * FROM Part_Inventory`
+    awsConnection.query(statement, (err,results)=>{
+        if (err) {console.log(err.message);
+            res.send();}
+        else {res.send(results);}
+
+    })
+}
+
+exports.updateinventory = function (req,res){
+    let statement = `UPDATE Part_Inventory SET quantity = ${req.body.quantity} WHERE pnid = ${req.body.pnid}`;
+    awsConnection.query(statement,(err,results)=>{
+        if (err) {console.log(err.message);
+        res.send(err.message);}
+        else {res.send(results);}
+    })
+
+}
+
+
+
 exports.charge = function(req,res){
     let statement = 'INSERT INTO Misc_Charges(shiphand_price, toweight, fromweight) VALUES (?,?,?)';
     let values = [req.body.shiphand_price, req.body.toweight, req.body.fromweight]
@@ -17,6 +39,14 @@ exports.charge = function(req,res){
             if(err){ console.log(err.message); }
             else {res.send(results);}
         });
+}
+
+exports.getcharge = function (req, res){
+    let statement = 'SELECT * FROM Misc_Charges';
+    awsConnection.query(statement, (err,results)=>{
+        if (err) {console.log(err.message);   }
+        else {res.send(results);}
+    })
 }
 
 exports.checkout = function(req,res){
