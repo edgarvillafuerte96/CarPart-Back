@@ -40,22 +40,25 @@ exports.updateorder = function(req,res){
               resolve(res);
               }
             });
-        }).then((data)=>{  //email query
-            console.log ('this is the data avilable for email')
+        }).then((data)=>{ 
+         //email query
+        console.log ('this is the data avilable for email')
         console.log(data);
         console.log(results);
         var mailOptions = {
             from: 'DoNotReply@team3A.com',
             to:  data[0].email,
-            subject: 'Order Confirmation',
+            subject: 'Order Has Shipped',
             text: `Hey ${data[0].name},
             Thanks for shopping with Team-3A we appreciate it. 
+
             Your Order# ${results[0].orderid}
             Order Date: ${results[0].order_date}
             Order Total: ${results[0].amt_charged}
-            Has shipped to 
-            Address:
+            Has shipped to Address:
             ${data[0].shipping_address} 
+
+
             Thank you, 
             Team-3A `
         };
@@ -65,7 +68,13 @@ exports.updateorder = function(req,res){
             else { console.log('email was sent');  }
         }); //end of email query
 
-
+        let shippinglabel = {
+            name: data[0].name,
+            orderid: results[0].orderid,
+            ammount: results[0].amt_charged,
+            shipping_address: data[0].shipping_address
+        };
+        res.send(shippinglabel);
         //end of the email query
         }) //end of getting db email promise then 
 
@@ -79,7 +88,7 @@ exports.updateorder = function(req,res){
 
 
         //this is inside the original promise
-        res.send(results);
+        //res.send(results);
     }).catch((message)=>{
         res.send(message);
         console.log(message);
@@ -88,8 +97,11 @@ exports.updateorder = function(req,res){
 }
 
 
-exports.ordersearch = function (req,res){
-    let statement = `SELECT * FROM Order1 FULL OUTER JOIN Order1 ON Order1.custid = Customer.custid WHERE ordeid = ${req.body.orderid}`;
+
+
+
+exports.allorder = function (req,res){
+    let statement = 'SELECT * FROM Order1'
 
     awsConnection.query(statement, (err,results)=>{
         if (err) {console.log(err.message);}

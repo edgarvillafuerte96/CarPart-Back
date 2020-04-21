@@ -105,3 +105,34 @@ exports.checkout = function(req,res){
         res.send(message);
     })
 }
+
+
+exports.searchorder = function(req,res){
+    if (req.body.mindate != null) {
+        let statement = `SELECT * FROM Order1 WHERE order_date >= \'${req.body.mindate}%\' AND order_date <= \'${req.body.maxdate}%\'`;
+        console.log(statement);
+        awsConnection.query(statement, (err,responce)=>{
+            if (err) { console.log(err.message);}
+            else {res.send(responce);}
+        });
+    }
+
+    else if (req.body.minmoney != null) {
+        let statement = `SELECT * FROM Order1 WHERE amt_charged >= ${req.body.minmoney} AND amt_charged <= ${req.body.maxmoney}`;
+        awsConnection.query(statement, (err,responce)=>{
+            if (err) { console.log(err.message);}
+            else {res.send(responce);}
+        });
+    }
+    else if (req.body.status != null) 
+    {
+        let statement = `SELECT * FROM Order1 WHERE order_status =\'${req.body.status}\'`;
+        console.log(statement);
+        awsConnection.query(statement, (err,responce)=>{
+            if (err) { console.log(err.message);}
+            else {res.send(responce);}
+        });
+    }
+
+
+}
