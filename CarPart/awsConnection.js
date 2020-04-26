@@ -10,8 +10,6 @@ var aws = mysql.createConnection({
      multiStatement: true
  });
 
-var conn = false;
-
 aws.connect(function(err){
     if (err){
         conn=false;

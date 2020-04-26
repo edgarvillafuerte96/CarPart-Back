@@ -4,16 +4,11 @@ let nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user:'edgar.villafuerte96@gmail.com',
-        pass: 'ebv113609'
+        user:'DoNotReplyTeam3A@gmail.com',
+        pass: 'cs467rocks'
     }
 });
-var mailOptions = {
-    from: 'edgar.villafuerte96@gmail.com',
-    to: 'test.123',
-    subject: 'Order Status',
-    text: 'your order has been shipped!'
-};
+
 
 exports.updateorder = function(req,res){
     let statement = 'SELECT * FROM Order1 WHERE orderid = ?';
@@ -45,22 +40,24 @@ exports.updateorder = function(req,res){
               resolve(res);
               }
             });
-        }).then((data)=>{  //email query
-            console.log ('this is the data avilable for email')
+        }).then((data)=>{ 
+         //email query
+        console.log ('this is the data avilable for email')
         console.log(data);
         console.log(results);
         var mailOptions = {
             from: 'DoNotReply@team3A.com',
-            to:  'edgar.villafuerte96@gmail.com',                       //data[0].email,
-            subject: 'Order Confirmation',
+            to:  data[0].email,
+            subject: 'Order Has Shipped',
             text: `Hey ${data[0].name},
             Thanks for shopping with Team-3A we appreciate it. 
+
             Your Order# ${results[0].orderid}
             Order Date: ${results[0].order_date}
             Order Total: ${results[0].amt_charged}
-            Has shipped to 
-            Address:
+            Has shipped to Address:
             ${data[0].shipping_address} 
+
 
             Thank you, 
             Team-3A `
@@ -71,7 +68,13 @@ exports.updateorder = function(req,res){
             else { console.log('email was sent');  }
         }); //end of email query
 
-
+        let shippinglabel = {
+            name: data[0].name,
+            orderid: results[0].orderid,
+            ammount: results[0].amt_charged,
+            shipping_address: data[0].shipping_address
+        };
+        res.send(shippinglabel);
         //end of the email query
         }) //end of getting db email promise then 
 
@@ -85,7 +88,7 @@ exports.updateorder = function(req,res){
 
 
         //this is inside the original promise
-        res.send(results);
+        //res.send(results);
     }).catch((message)=>{
         res.send(message);
         console.log(message);
@@ -94,8 +97,11 @@ exports.updateorder = function(req,res){
 }
 
 
-exports.ordersearch = function (req,res){
-    let statement = `SELECT * FROM Order1 FULL OUTER JOIN Order1 ON Order1.custid = Customer.custid WHERE ordeid = ${req.body.orderid}`;
+
+
+
+exports.allorder = function (req,res){
+    let statement = 'SELECT * FROM Order1'
 
     awsConnection.query(statement, (err,results)=>{
         if (err) {console.log(err.message);}
@@ -104,3 +110,41 @@ exports.ordersearch = function (req,res){
         }
     })
 }
+
+exports.invoice = function (req,res){
+
+    let statement = `SELECT * FROM Order1 INNER JOIN Order_Item ON Order1.orderid= ${req.body.orderid} AND Order_Item.orderid=${req.body.orderid}`;
+    let promise = new Promise ((resolve, reject )=>{
+        awsConnection.query(statement,(err,results)=>{
+            if (err) {
+                console.log(err.message);
+                reject(err.message);
+            }
+            else {
+                resolve(results);
+            }
+        })
+
+    }).then((results)=>{
+        console.log(results);
+        let p = new Promise ((resolve,reject)=>{
+            let hey = `SELECT * FROM Customer WHERE custid = ${results[0].custid}`
+            console.log(hey);
+            awsConnection.query(hey,(err,results)=>{
+                if (err) {reject(err.message);}
+                else {resolve(results)}
+            })
+        }).then((custinfo)=>{
+            let size = results.length;
+            console.log(size);
+            results[size] = {
+            "custid":custinfo[0].custid,
+            "name": custinfo[0].name,
+            "email": custinfo[0].email,
+            "billing_address": custinfo[0].billing_address,
+            "shipping_address": custinfo[0].shipping_address
+            };
+            res.send(results);
+        })
+    }).catch((message)=>{res.send('Error in this invoice at the first promise');})
+} // end of function
