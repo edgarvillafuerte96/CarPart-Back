@@ -15,7 +15,7 @@ var conn = false;
 connection.connect(function(err){
     if (err){
         conn=false;
-        console.log("failled to connect to db");
+        console.log("failled to connect to legacy db");
         return;
     }
     conn=true;
