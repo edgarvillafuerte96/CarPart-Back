@@ -142,7 +142,7 @@ exports.insertitem = function (req,res){
     let order = req.body.order;
     let orderid = req.body.orderid;
     for(let i =0; i <= order.length; i++){
-        let statement = `INSERT INTO Order_Item (corderid, pnid, quantity_order) VALUES (${orderid}, ${order[i].pnid}, ${order[i].quanity_ordered}) `;
+        let statement = `INSERT INTO Order_Item (corderid, pnid, quantity_order, item_price) VALUES (${orderid}, ${order[i].pnid}, ${order[i].quanity_ordered}, ${req.body.item_price}) `;
         console.log(statement);
         awsConnection.query(statement,(err,results)=>{
             if (err){ console.log(err.message); return;}
