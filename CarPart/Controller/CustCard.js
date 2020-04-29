@@ -152,14 +152,42 @@ exports.searchorder = function(req,res){
 
 exports.insertitem = function (req,res){
     let order = req.body.order;
+    order = JSON.parse(order);
     let orderid = req.body.orderid;
-    for(let i =0; i <= order.length; i++){
-        let statement = `INSERT INTO Order_Item (orderid, pnid, quantity_order, item_weight, item_price) VALUES (${orderid}, ${order[i].number}, ${order[i].quanity_ordered}, ${order[i].weight} ,${req.body.price}) `;
+    let weight =0;
+    console.log(order.length);
+    console.log(order);
+    for(let i =0; order[i] != null; i++){
+        console.log(order[i].weight);
+        weight += (order[i].weight * order[i].quanity_ordered);
+        let statement = `INSERT INTO Order_Item (orderid, pnid, quanity_ordered, item_weight, item_price) VALUES (${orderid}, ${order[i].number}, ${order[i].quanity_ordered}, ${order[i].weight} ,${order[i].price}) `;
         console.log(statement);
         awsConnection.query(statement,(err,results)=>{
             if (err){ console.log(err.message); return;}
         })
     }
-   
+    console.log(weight)
+   insertweight(orderid,weight);
     res.send('order insert has been completed');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+function insertweight(id, weight){
+    console.log(weight);
+    console.log(id);
+    let statement = `UPDATE Order1 set total_weight = ${weight} WHERE orderid = ${id}`;
+    awsConnection.query(statement,(err,results)=>{
+        if (err) { console.log('fuck at the insert weight'); }
+        else {return 'we successful at life and inserting weight';}
+    })
 }
