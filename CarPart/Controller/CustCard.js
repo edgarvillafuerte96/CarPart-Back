@@ -24,7 +24,7 @@ exports.updateinventory = function (req,res){
     let statement = `UPDATE Part_Inventory SET quantity = ${req.body.quantity} WHERE pnid = ${req.body.pnid}`;
     awsConnection.query(statement,(err,results)=>{
         if (err) {console.log(err.message);
-        res.send(err.message);}
+        }
         else {res.send(results);}
     })
 
@@ -83,7 +83,7 @@ exports.checkout = function(req,res){
         amount: req.body.amt_charged
     }).then((responce)=>{
         console.log(responce.data);
-        res.send(responce.data.authorization);
+        //res.send(responce.data.authorization + id);
         let status = '\'paid not shipped\'';
         statement = `INSERT INTO Order1(custid, authorization, amt_charged, order_status) VALUES (${id}, ${responce.data.authorization}, ${responce.data.amount}, ${status})`;
         console.log(statement);
@@ -92,10 +92,22 @@ exports.checkout = function(req,res){
                 console.log(err.message);
             }
             else{
-                console.log('order1 insert worked' + results);
+                console.log('order1 insert worked');
             }
         }) 
-
+        new Promise((res,rec)=>{
+            let statement = `SELECT orderid FROM Order1 where authorization = ${responce.data.authorization}`
+            awsConnection.query(statement,(err,results)=>{
+                if (err){ rec(err.message);}
+                else {  res(results);}
+            })
+        }).then((orderid)=>{
+            console.log (orderid);
+            let sendBack= [{"authorization": responce.data.authorization},
+                            {"orderid": orderid[0].orderid}]
+                            console.log(sendBack)
+            res.send(sendBack);
+        })
     })
     .catch((error)=>{
         res.send(error);
@@ -142,7 +154,7 @@ exports.insertitem = function (req,res){
     let order = req.body.order;
     let orderid = req.body.orderid;
     for(let i =0; i <= order.length; i++){
-        let statement = `INSERT INTO Order_Item (corderid, pnid, quantity_order, item_price) VALUES (${orderid}, ${order[i].pnid}, ${order[i].quanity_ordered}, ${req.body.item_price}) `;
+        let statement = `INSERT INTO Order_Item (orderid, pnid, quantity_order, item_weight, item_price) VALUES (${orderid}, ${order[i].number}, ${order[i].quanity_ordered}, ${order[i].weight} ,${req.body.price}) `;
         console.log(statement);
         awsConnection.query(statement,(err,results)=>{
             if (err){ console.log(err.message); return;}

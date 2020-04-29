@@ -1,6 +1,6 @@
 let awsConnection = require ('../awsConnection');
 let nodemailer = require('nodemailer');
-
+//let login = require ('../')
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
