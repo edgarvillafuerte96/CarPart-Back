@@ -67,14 +67,27 @@ exports.updateorder = function(req,res){
             if (error) { console.log(error); }
             else { console.log('email was sent');  }
         }); //end of email query
+            new Promise((resolve,reject)=>{
+            let statem = `SELECT * FROM Order_Item WHERE orderid = ${results[0].orderid}`
+                awsConnection.query(statem,(err,results)=>{
+                    if (err) { reject(err);}
+                    else {resolve(results)}
+                })
 
-        let shippinglabel = {
-            name: data[0].name,
-            orderid: results[0].orderid,
-            ammount: results[0].amt_charged,
-            shipping_address: data[0].shipping_address
-        };
-        res.send(shippinglabel);
+
+            }).then((back)=>{
+                console.log('here is the return from new promise');
+                console.log(back); //modify the return
+                back[back.length] = {
+                    name: data[0].name,
+                    orderid: results[0].orderid,
+                    ammount: results[0].amt_charged,
+                    shipping_address: data[0].shipping_address
+                };
+                res.send(back)
+            }).catch((errs)=>{
+                res.send(back);
+            })
         //end of the email query
         }) //end of getting db email promise then 
 
@@ -97,9 +110,6 @@ exports.updateorder = function(req,res){
 }
 
 
-
-
-
 exports.allorder = function (req,res){
     let statement = 'SELECT * FROM Order1'
 
@@ -110,41 +120,3 @@ exports.allorder = function (req,res){
         }
     })
 }
-
-exports.invoice = function (req,res){
-
-    let statement = `SELECT * FROM Order1 INNER JOIN Order_Item ON Order1.orderid= ${req.body.orderid} AND Order_Item.orderid=${req.body.orderid}`;
-    let promise = new Promise ((resolve, reject )=>{
-        awsConnection.query(statement,(err,results)=>{
-            if (err) {
-                console.log(err.message);
-                reject(err.message);
-            }
-            else {
-                resolve(results);
-            }
-        })
-
-    }).then((results)=>{
-        console.log(results);
-        let p = new Promise ((resolve,reject)=>{
-            let hey = `SELECT * FROM Customer WHERE custid = ${results[0].custid}`
-            console.log(hey);
-            awsConnection.query(hey,(err,results)=>{
-                if (err) {reject(err.message);}
-                else {resolve(results)}
-            })
-        }).then((custinfo)=>{
-            let size = results.length;
-            console.log(size);
-            results[size] = {
-            "custid":custinfo[0].custid,
-            "name": custinfo[0].name,
-            "email": custinfo[0].email,
-            "billing_address": custinfo[0].billing_address,
-            "shipping_address": custinfo[0].shipping_address
-            };
-            res.send(results);
-        })
-    }).catch((message)=>{res.send('Error in this invoice at the first promise');})
-} // end of function

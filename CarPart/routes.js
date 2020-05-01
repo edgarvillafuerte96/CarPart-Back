@@ -5,6 +5,7 @@ module.exports = function(app) {
     
     app.route('/parts')
        .get(legacy.getallparts)
+       
     app.route('/searchPart')
        .get(legacy.onepart)
 
@@ -22,9 +23,9 @@ module.exports = function(app) {
         .get(Custinfo.getinventory) //returns all the items in eventory no body
         .put(Custinfo.updateinventory)  //update the quanity PNID quantity as params
     app.route('/shiplabel')
-        .get(email.updateorder) //will return shipping needed info.. pass orderid body
-    app.route('/invoice')
-        .get(email.invoice)
+        .post(email.updateorder) //will return shipping needed info.. pass orderid body
+    
+        
     app.route('/allorders')
         .get(email.allorder)
 
@@ -33,4 +34,9 @@ module.exports = function(app) {
    //     .post(Custinfo.orderitems)
    app.route('/ordersearch')
         .get(Custinfo.searchorder)
+
+    app.route('/cart')
+        .post(Custinfo.cart)
+        .get(Custinfo.returncart)
+
 };

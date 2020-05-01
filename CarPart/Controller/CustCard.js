@@ -20,13 +20,31 @@ exports.getinventory = function (req,res){
     })
 }
 
+
 exports.updateinventory = function (req,res){
-    let statement = `UPDATE Part_Inventory SET quantity = ${req.body.quantity} WHERE pnid = ${req.body.pnid}`;
-    awsConnection.query(statement,(err,results)=>{
-        if (err) {console.log(err.message);
-        }
-        else {res.send(results);}
-    })
+   let statement = `SELECT * FROM Part_Inventory WHERE pnid = ${req.body.pnid}`;
+   console.log(statement);
+   new Promise ((accept,reject)=>{
+       awsConnection.query(statement, (err,results)=>{
+           if (err){
+               reject(err);
+           }
+           else{
+               accept(results)
+           }
+       })
+   }).then((cnt)=>{
+       
+        let newinventory = Number(cnt[0].quantity) + Number(req.body.quantity);
+        let statement = `UPDATE Part_Inventory SET quantity = ${Number(cnt[0].quantity) + Number(req.body.quantity)} WHERE pnid = ${req.body.pnid} `;
+        console.log(statement)
+        awsConnection.query(statement, (err,results)=>{
+            if (err) { console.log(err.message)}
+        })
+       res.send(cnt);
+   }).catch((message)=>{
+       res.send(message);
+   })
 
 }
 
@@ -171,17 +189,6 @@ exports.insertitem = function (req,res){
     res.send('order insert has been completed');
 }
 
-
-
-
-
-
-
-
-
-
-
-
 function insertweight(id, weight){
     console.log(weight);
     console.log(id);
@@ -189,5 +196,60 @@ function insertweight(id, weight){
     awsConnection.query(statement,(err,results)=>{
         if (err) { console.log('fuck at the insert weight'); }
         else {return 'we successful at life and inserting weight';}
+    })
+}
+
+
+exports.cart = function (req,res){
+   let statement = `INSERT INTO Cart (description, number, price, weight,url) VALUES (\'${req.body.description}\',${req.body.number},${req.body.price},${req.body.weight},\'${req.body.url}\')`;
+   console.log(statement);
+   awsConnection.query(statement,(err,results)=>{
+       if(err){
+           console.log(err.message);
+           res.send(err.message);
+           return;
+       }
+       else{
+           res.send(results);
+       }
+   }) 
+}
+
+exports.returncart = function(req,res){
+    let statement = `SELECT * FROM Cart`;
+    new Promise((resolve,reject)=>{
+        awsConnection.query(statement,(err,results)=>{
+            if (err){
+                reject(err.message)
+            }
+            else {resolve(results)}
+        })
+    }).then((cart)=>{
+        console.log(cart);
+        console.log(cart[0].price);
+        cart = JSON.parse(cart);
+        let Tweight=0;
+        let Ttotal=0;
+        for (let i =0; i< cart.length;i++){
+            Tweight += cart[i].weight;
+            Ttotal += cart[i].price;
+        }
+
+        new((resolve,reject)=>{
+            let hey = `SELECT shiphand_price from Misc_Charges WHERE toweight >= ${Tweight} AND fromWeight <= ${Tweight}`;
+            awsConnection.query(hey,(err,results)=>{
+                if
+            })
+        })
+
+
+
+
+
+
+        cart[cart.length] = {
+            "TotalWeight": Tweight,
+            "GrandTotal": Ttotal
+        };
     })
 }
