@@ -231,7 +231,6 @@ exports.returncart = function(req,res){
         for (let i =0; i< cart.length;i++){
             Tweight += (cart[i].weight * cart[i].quantity)
             Ttotal += (cart[i].price * cart[i].quantity);
-            console.log('round 1');
         }
         console.log(Ttotal)
         console.log(Tweight)
