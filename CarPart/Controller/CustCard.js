@@ -201,7 +201,7 @@ function insertweight(id, weight){
 
 
 exports.cart = function (req,res){
-   let statement = `INSERT INTO Cart (description, number, price, weight,url) VALUES (\'${req.body.description}\',${req.body.number},${req.body.price},${req.body.weight},\'${req.body.url}\')`;
+   let statement = `INSERT INTO Cart ('description', 'number', 'price', 'weight','url','quanity') VALUES (\'${req.body.description}\',${req.body.number},${req.body.price},${req.body.weight},\'${req.body.url}\',${req.body.quantity})`;
    console.log(statement);
    awsConnection.query(statement,(err,results)=>{
        if(err){
@@ -225,31 +225,44 @@ exports.returncart = function(req,res){
             else {resolve(results)}
         })
     }).then((cart)=>{
-        console.log(cart);
-        console.log(cart[0].price);
-        cart = JSON.parse(cart);
-        let Tweight=0;
-        let Ttotal=0;
+        var Tweight=0;
+        var Ttotal=0;
+        console.log(cart.length);
         for (let i =0; i< cart.length;i++){
-            Tweight += cart[i].weight;
-            Ttotal += cart[i].price;
+            Tweight += (cart[i].weight * cart[i].quantity)
+            Ttotal += (cart[i].price * cart[i].quantity);
+            console.log('round 1');
         }
-
-        new((resolve,reject)=>{
-            let hey = `SELECT shiphand_price from Misc_Charges WHERE toweight >= ${Tweight} AND fromWeight <= ${Tweight}`;
-            awsConnection.query(hey,(err,results)=>{
-                if
-            })
-        })
-
-
-
-
-
-
+        console.log(Ttotal)
+        console.log(Tweight)
+        //new Promise ((resolve,reject)=>{
+        //    let hey = `SELECT shiphand_price from Misc_Charges WHERE toweight >= ${Tweight} AND fromWeight <= ${Tweight}`;
+        //    awsConnection.query(hey,(err,resu)=>{
+        //        if (err){
+        //            reject(err.message);
+        //        }
+        //        else {resolve(resu);}
+        //    })
+        //}).then((weight)=>{
+        //    console.log(weight);
+        //    Ttotal += weight[0].shiphand_price;
+//
+        //    cart[cart.length] = {
+        //        "TotalWeight": Tweight,
+        //        "GrandTotal": Ttotal
+        //    };
+        //    console.log(cart);
+        //    res.send(cart);
+        //}).catch((message)=>{
+        //    res.send(message);
+        //})
         cart[cart.length] = {
-            "TotalWeight": Tweight,
-            "GrandTotal": Ttotal
+            "totalWeight": Tweight,
+            "totalCost": Ttotal
         };
+
+        res.send(cart);
+    }).catch((message)=>{
+        res.send(message);
     })
 }
